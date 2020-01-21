@@ -21,7 +21,39 @@ class Jobs {
       jobs: jobsOnPage
     }
 
-    res.send({data: jobs})
+    return res.send({data: jobs})
+  }
+ 
+
+  async search(req, res) {
+    const result = await getAsync('github')
+    const data = JSON.parse(result)
+
+    const searchStr = req.query.search
+    const searchTerms = searchStr.split(' ')
+
+    if(searchTerms.length === 0 || !searchTerms) {
+      return this.index(req, res)
+    }
+
+    const filteredJobs = data.filter(job => searchTerms.some(term => job.title.includes(term)))
+
+    const numJobs = filteredJobs.length
+    const numPages = Math.ceil(numJobs / 50)
+    let page = req.query.page
+    page = page > numPages || page <= 0 ? 1 : page
+
+    const index = page -1
+    const jobsOnPage = filteredJobs.slice(index * 50, (index * 50) + 50)
+
+    const jobs = {
+      total_jobs: numJobs,
+      page,
+      total_pages: numPages,
+      jobs: jobsOnPage
+    }
+    
+    return res.send({data: jobs})
   }
   
 }
