@@ -1,0 +1,26 @@
+language: node_js
+node_js:
+  - "lts/*"
+  
+#safelist
+branches:
+  only:
+  - master
+
+env:
+- PORT=8080   
+
+install:
+  - npm i
+
+jobs:
+  include:
+    - stage: test
+    - script: npm run test
+
+notifications:
+  email:
+    recipients: 
+      - eberdellima@outlook.com
+    on_success: always
+    on_failure: always
